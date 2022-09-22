@@ -25,6 +25,7 @@ export const Content = styled.div`
   background: #fff;
   border: solid ${shade(0.2, "#0088cc")} 5px;
   border-radius: 9px;
+  border-left: none;
   input {
     margin-top: 8px;
     padding: 2px;

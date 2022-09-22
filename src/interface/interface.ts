@@ -8,3 +8,8 @@ export interface Payload {
   name: string;
   text: string;
 }
+
+export interface Users {
+  id: string;
+  name: string;
+}

@@ -9,6 +9,8 @@ import { Container, Content, Card, Title } from "./Home.styles";
 
 import MessageList from "../../components/MessageList/MessageList";
 
+import UserBar from "../../components/UserBar";
+
 import { Message, Payload } from "../../interface/interface";
 
 const Home: React.FC = () => {
@@ -20,7 +22,11 @@ const Home: React.FC = () => {
     JSON.parse(window.localStorage.getItem("messages") || "[]") ?? []
   );
 
+  // const [users, setUsers] = useState([]);
+
   const soket = io("http://localhost:3001");
+
+  console.log(soket);
 
   useEffect(() => {
     window.localStorage.setItem("messages", JSON.stringify(messages));
@@ -54,6 +60,7 @@ const Home: React.FC = () => {
 
   return (
     <Container>
+      <UserBar />
       <Content>
         <Title>Chat Web</Title>
         <input
