@@ -5,11 +5,12 @@ export interface Message {
 }
 
 export interface Payload {
+  id: string;
   name: string;
   text: string;
 }
 
-export interface Users {
+export interface User {
   id: string;
   name: string;
 }

@@ -14,19 +14,25 @@ import UserBar from "../../components/UserBar";
 import { Message, Payload } from "../../interface/interface";
 
 const Home: React.FC = () => {
-  const [name, setName] = useState(
-    JSON.parse(window.localStorage.getItem("name") ?? "[]") ?? ""
-  );
+  const [name, setName] = useState("");
   const [text, setText] = useState("");
-  const [messages, setMessages] = useState<Message[]>(
-    JSON.parse(window.localStorage.getItem("messages") || "[]") ?? []
-  );
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  // const [users, setUsers] = useState<User[]>([]);
 
   // const [users, setUsers] = useState([]);
 
   const soket = io("http://localhost:3001");
 
-  console.log(soket);
+  // useEffect(() => {
+  //   const newUser: User = {
+  //     id: soket.id,
+  //     name: name,
+  //   };
+
+  //   setUsers((prevState) => [...prevState, newUser]);
+  //   console.log(users);
+  // }, [soket.id]);
 
   useEffect(() => {
     window.localStorage.setItem("messages", JSON.stringify(messages));
@@ -40,6 +46,7 @@ const Home: React.FC = () => {
     }
 
     soket.on("msgToClient", (message: Payload) => {
+      console.log(message);
       receivedMessage(message);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -48,6 +55,7 @@ const Home: React.FC = () => {
   function sendMessage() {
     if (name.length > 0 && text.length > 0) {
       const message: Payload = {
+        id: soket.id,
         name,
         text,
       };
