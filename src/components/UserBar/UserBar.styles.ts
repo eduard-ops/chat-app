@@ -28,5 +28,6 @@ export const UsersList = styled.ul`
     padding: 15px;
     border-radius: 8px;
     cursor: pointer;
+    margin-bottom: 16px;
   }
 `;

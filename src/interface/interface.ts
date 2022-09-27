@@ -14,3 +14,9 @@ export interface User {
   id: string;
   name: string;
 }
+
+export interface userPayload {
+  id: string;
+  name: string;
+  text: string;
+}

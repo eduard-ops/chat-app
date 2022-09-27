@@ -1,5 +1,5 @@
 /* eslint-disable array-callback-return */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 
 import { v4 } from "uuid";
 
@@ -11,28 +11,31 @@ import MessageList from "../../components/MessageList/MessageList";
 
 import UserBar from "../../components/UserBar";
 
-import { Message, Payload } from "../../interface/interface";
+import { Message, Payload, User } from "../../interface/interface";
 
 const Home: React.FC = () => {
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
 
-  // const [users, setUsers] = useState<User[]>([]);
+  const soket = useRef(io("http://localhost:3001"));
+
+  useEffect(() => {
+    let namePr: any = prompt("Enter your name");
+    const user: User = {
+      id: v4(),
+      name: namePr,
+    };
+    setName(namePr);
+    soket.current.emit("addUser", user);
+    soket.current.on("getUsers", (users) => {
+      setUsers(users);
+      console.log(users);
+    });
+  }, []);
 
   // const [users, setUsers] = useState([]);
-
-  const soket = io("http://localhost:3001");
-
-  // useEffect(() => {
-  //   const newUser: User = {
-  //     id: soket.id,
-  //     name: name,
-  //   };
-
-  //   setUsers((prevState) => [...prevState, newUser]);
-  //   console.log(users);
-  // }, [soket.id]);
 
   useEffect(() => {
     window.localStorage.setItem("messages", JSON.stringify(messages));
@@ -45,8 +48,7 @@ const Home: React.FC = () => {
       setMessages([...messages, newMessage]);
     }
 
-    soket.on("msgToClient", (message: Payload) => {
-      console.log(message);
+    soket.current.on("msgToClient", (message: Payload) => {
       receivedMessage(message);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -55,20 +57,20 @@ const Home: React.FC = () => {
   function sendMessage() {
     if (name.length > 0 && text.length > 0) {
       const message: Payload = {
-        id: soket.id,
+        id: soket.current.id,
         name,
         text,
       };
 
-      soket.emit("msgToServer", message);
-      window.localStorage.setItem("name", JSON.stringify(message.name));
+      soket.current.emit("msgToServer", message);
+      window.localStorage.setItem("name", JSON.stringify(name));
       setText("");
     }
   }
 
   return (
     <Container>
-      <UserBar />
+      <UserBar users={users} />
       <Content>
         <Title>Chat Web</Title>
         <input

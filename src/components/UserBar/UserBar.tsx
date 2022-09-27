@@ -2,14 +2,16 @@ import { UserContainer, NavTitle, UsersList } from "./UserBar.styles";
 
 // import { useState } from "react";
 
-// import { ListProps } from "../../types/types";
+import { UsersProps } from "../../types/types";
 
-const UserBar = () => {
+const UserBar = ({ users }: UsersProps) => {
   return (
     <UserContainer>
-      <NavTitle>Online ({[].length}) :</NavTitle>
+      <NavTitle>Online ({users.length}) :</NavTitle>
       <UsersList>
-        <li>Антон</li>
+        {users.map((item) => (
+          <li>{item.name}</li>
+        ))}
       </UsersList>
     </UserContainer>
   );
