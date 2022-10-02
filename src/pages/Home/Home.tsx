@@ -17,60 +17,65 @@ const Home: React.FC = () => {
   const [name, setName] = useState("");
   const [text, setText] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [arrivalMessage, setArrivalMessage] = useState<any>(null);
+  const [receiverId, setReceiverId] = useState("");
   const [users, setUsers] = useState<User[]>([]);
+  const [userSocket, setUserSocket] = useState("");
 
-  const soket = useRef(io("http://localhost:3001"));
+  const socket: any = useRef();
 
   useEffect(() => {
-    let namePr: any = prompt("Enter your name");
+    socket.current = io("http://localhost:3001");
+    socket.current.on("getMessage", (message: Payload) => {
+      setArrivalMessage({
+        id: message.id,
+        receiverId: message.receiverId,
+        name: message.name,
+        text: message.text,
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    let namePr: any = prompt("Enter your name", "");
     const user: User = {
       id: v4(),
       name: namePr,
     };
     setName(namePr);
-    soket.current.emit("addUser", user);
-    soket.current.on("getUsers", (users) => {
+    socket.current.emit("addUser", user);
+    socket.current.on("getUsers", (users: []) => {
       setUsers(users);
-      console.log(users);
     });
   }, []);
 
-  // const [users, setUsers] = useState([]);
-
   useEffect(() => {
-    window.localStorage.setItem("messages", JSON.stringify(messages));
-    function receivedMessage(message: Payload) {
-      const newMessage: Message = {
-        id: v4(),
-        name: message.name,
-        text: message.text,
-      };
-      setMessages([...messages, newMessage]);
-    }
+    arrivalMessage &&
+      setMessages((prevState) => [...prevState, arrivalMessage]);
+  }, [arrivalMessage]);
 
-    soket.current.on("msgToClient", (message: Payload) => {
-      receivedMessage(message);
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages]);
-
-  function sendMessage() {
+  const sendMessage = () => {
     if (name.length > 0 && text.length > 0) {
       const message: Payload = {
-        id: soket.current.id,
-        name,
+        id: socket.current.id,
+        name: name,
+        receiverId,
         text,
       };
-
-      soket.current.emit("msgToServer", message);
-      window.localStorage.setItem("name", JSON.stringify(name));
+      socket.current.emit("sendMessage", message);
+      setMessages((prevState) => [...prevState, message]);
       setText("");
     }
-  }
+  };
 
   return (
     <Container>
-      <UserBar users={users} />
+      <UserBar
+        setUserSocket={setUserSocket}
+        name={name}
+        setReceiverId={setReceiverId}
+        users={users}
+      />
       <Content>
         <Title>Chat Web</Title>
         <input
@@ -80,14 +85,18 @@ const Home: React.FC = () => {
           placeholder="Enter name..."
         />
         <Card>
-          <MessageList name={name} messages={messages} />
+          <MessageList
+            userSocket={userSocket}
+            receiverId={receiverId}
+            messages={messages}
+          />
         </Card>
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Enter message..."
         />
-        <button type="button" onClick={() => sendMessage()}>
+        <button type="button" onClick={sendMessage}>
           Sent
         </button>
       </Content>

@@ -5,7 +5,7 @@ import { shade } from "polished";
 export const UserContainer = styled.div`
   background-color: bisque;
   width: 15%;
-  height: 61%;
+  height: 64%;
   background: #fff;
   border: solid ${shade(0.2, "#0088cc")} 5px;
   border-radius: 9px;

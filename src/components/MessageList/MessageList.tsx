@@ -1,16 +1,19 @@
 import { MyMessage, OtherMessage } from "./MessageList.styles";
 
-import { Message } from "../../interface/interface";
-
 import { ListProps } from "../../types/types";
 
-const MessageList = ({ name, messages }: ListProps) => {
+const MessageList = ({ userSocket, receiverId, messages }: ListProps) => {
+  const filterVisibleMessage = () => {
+    return messages.filter(
+      (item: any) => item.receiverId === receiverId || item.id === userSocket
+    );
+  };
   return (
     <ul>
-      {messages.map((msg: Message) => {
-        if (msg.name === name) {
+      {filterVisibleMessage().map((msg: any, index) => {
+        if (msg.receiverId !== receiverId) {
           return (
-            <MyMessage key={msg.id}>
+            <MyMessage key={index}>
               <span>{msg.name}:</span>
 
               <p>{msg.text}</p>
@@ -18,7 +21,7 @@ const MessageList = ({ name, messages }: ListProps) => {
           );
         }
         return (
-          <OtherMessage key={msg.id}>
+          <OtherMessage key={index}>
             <span>{msg.name}:</span>
 
             <p>{msg.text}</p>
